@@ -26,9 +26,6 @@ version:            0.1.0.0
 synopsis:
     Data processing Backend programmed in Haskell for a Football Analysis page, in which communication will proceed in a three-way flow (Imperative JavaScript -> Haskell -> React App) using REST API.
 
--- A longer description of the package.
--- description:
-
 -- URL for the project homepage or repository.
 homepage:
     https://github.com/azvcud/Backend_DataProcessing_Haskell_Modelos-II
@@ -73,7 +70,11 @@ executable Backend-DataProcessing-Haskell-Modelos-II
     -- other-extensions:
 
     -- Other library packages from which modules are imported.
-    build-depends:    base ^>=4.17.2.1
+    build-depends:  base ^>=4.17.2.1,
+                    scotty,
+                    aeson,
+                    text,
+                    wreq
 
     -- Directories containing source files.
     hs-source-dirs:   app
