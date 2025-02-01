@@ -1,0 +1,3 @@
+cradle:
+  cabal:
+    component: "exe:Backend-DataProcessing-Haskell-Modelos-II"
