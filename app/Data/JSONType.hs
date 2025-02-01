@@ -2,26 +2,41 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Data.JSONType
-    ( Response(..)
-    , UserInfo(..)
+    ( Match(..)
+    , Team(..)
+    , Score(..)
     ) where
 
-import Data.Aeson (ToJSON)
+import Data.Aeson (ToJSON, FromJSON)
 import GHC.Generics (Generic)
 import Data.Text.Lazy (Text)
 
--- Definición del tipo de dato
-data Response = Response
-    { message :: Text
-    , status  :: Text
-    } deriving (Generic)
+-- Definición de los tipos de datos
+data Match = Match
+    { matchId   :: Int
+    , homeTeam  :: Team
+    , awayTeam  :: Team
+    , score     :: Score
+    , date      :: Text
+    } deriving (Show, Generic)
 
-instance ToJSON Response
+data Team = Team
+  { name :: Text
+  , shield :: Text
+  } deriving (Show, Generic)
 
--- Nuevo tipo de dato
-data UserInfo = UserInfo
-    { nombre :: Text
-    , numero :: Int
-    } deriving (Generic)
+data Score = Score
+  { home :: Int
+  , away :: Int
+  } deriving (Show, Generic)
 
-instance ToJSON UserInfo
+-- Instancias de FromJSON y ToJSON para los tipos de datos
+instance FromJSON Team
+instance ToJSON Team
+
+instance FromJSON Score
+instance ToJSON Score
+
+instance FromJSON Match
+instance ToJSON Match
+
