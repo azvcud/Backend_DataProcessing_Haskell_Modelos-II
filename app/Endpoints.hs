@@ -9,6 +9,7 @@ import Data.JSONType
     ( Match(..)
     , Team(..)
     , Score(..)
+    , Standing(..)
     )
 
 import Network.HTTP.Types.Status (notFound404)
@@ -50,6 +51,31 @@ exampleMatches =
       }
   ]
 
+exampleStandings :: [Standing]
+exampleStandings = 
+    [ Standing
+        { position = 1
+        , team = "Liverpool"
+        , played = 21
+        , points = 48
+        , shield_S = "https://resources.premierleague.com/premierleague/badges/t14.svg"
+        }
+    , Standing
+        { position = 2
+        , team = "Man City"
+        , played = 20
+        , points = 46
+        , shield_S = "https://resources.premierleague.com/premierleague/badges/t43.svg"
+        }
+    , Standing
+        { position = 3
+        , team = "Arsenal"
+        , played = 21
+        , points = 43
+        , shield_S = "https://resources.premierleague.com/premierleague/badges/t3.svg"
+        }
+    ]
+
 findMatchById :: Int -> Maybe Match
 findMatchById searchId =
     case filter (\m -> searchId == matchId m) exampleMatches of
@@ -70,3 +96,6 @@ app = do
             Nothing    -> do
                 status notFound404
                 json ("Match not found" :: String)
+
+    get "/standings" $ do
+        json exampleStandings
