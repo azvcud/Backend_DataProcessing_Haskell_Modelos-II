@@ -1,8 +1,9 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Data.Response
+module Data.JSONType
     ( Response(..)
+    , UserInfo(..)
     ) where
 
 import Data.Aeson (ToJSON)
@@ -16,3 +17,11 @@ data Response = Response
     } deriving (Generic)
 
 instance ToJSON Response
+
+-- Nuevo tipo de dato
+data UserInfo = UserInfo
+    { nombre :: Text
+    , numero :: Int
+    } deriving (Generic)
+
+instance ToJSON UserInfo

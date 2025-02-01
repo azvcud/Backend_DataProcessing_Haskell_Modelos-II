@@ -4,4 +4,4 @@ import Web.Scotty
 import Endpoints (app)
 
 main :: IO ()
-main = scotty 3000 app
+main = scotty 8000 app

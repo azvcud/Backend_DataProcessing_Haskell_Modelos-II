@@ -71,7 +71,7 @@ executable Backend-DataProcessing-Haskell-Modelos-II
     hs-source-dirs:   app  
 
     -- Modules included in this executable, other than Main.
-    other-modules:  Data.Response,
+    other-modules:  Data.JSONType,
                     Endpoints
 
     -- Enable extensions used in your code (e.g., OverloadedStrings)

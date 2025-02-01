@@ -5,8 +5,7 @@ module Endpoints
     ) where
 
 import Web.Scotty
-import Data.Text.Lazy (Text)
-import Data.Response (Response(..))
+import Data.JSONType (Response(..), UserInfo(..))
 
 -- Definición de los endpoints
 app :: ScottyM ()
@@ -14,3 +13,7 @@ app = do
     get "/json" $ do
         let jsonResponse = Response "Hello, world!" "success"
         json jsonResponse
+
+    get "/user" $ do
+        let userInfo = UserInfo "Alice" 42
+        json userInfo
