@@ -4,83 +4,50 @@ module Endpoints
     ( app
     ) where
 
+import Network.HTTP.Types.Status (notFound404)
 import Web.Scotty
+import Data.Text.Lazy (Text)
+import Data.List (find)
 import Data.JSONType 
     ( Match(..)
     , Team(..)
     , Score(..)
-    , Standing(..)
+    , Statistics(..)
+    , MVP(..)
+    , Highlights(..)
+    , Player(..)
     )
-
-import Network.HTTP.Types.Status (notFound404)
 
 -- JSON de Ejemplo
 exampleMatches :: [Match]
 exampleMatches =
-  [ Match
-      { matchId = 1
-      , homeTeam = Team
-          { name = "Liverpool"
-          , shield = "https://resources.premierleague.com/premierleague/badges/t14.svg"
-          }
-      , awayTeam = Team
-          { name = "Man City"
-          , shield = "https://resources.premierleague.com/premierleague/badges/t43.svg"
-          }
-      , score = Score
-          { home = 2
-          , away = 1
-          }
-      , date = "2023-10-01"
-      }
-  , Match
-      { matchId = 2
-      , homeTeam = Team
-          { name = "Arsenal"
-          , shield = "https://resources.premierleague.com/premierleague/badges/t3.svg"
-          }
-      , awayTeam = Team
-          { name = "Tottenham"
-          , shield = "https://resources.premierleague.com/premierleague/badges/t6.svg"
-          }
-      , score = Score
-          { home = 3
-          , away = 2
-          }
-      , date = "2023-10-02"
-      }
-  ]
-
-exampleStandings :: [Standing]
-exampleStandings = 
-    [ Standing
-        { position = 1
-        , team = "Liverpool"
-        , played = 21
-        , points = 48
-        , shield_S = "https://resources.premierleague.com/premierleague/badges/t14.svg"
-        }
-    , Standing
-        { position = 2
-        , team = "Man City"
-        , played = 20
-        , points = 46
-        , shield_S = "https://resources.premierleague.com/premierleague/badges/t43.svg"
-        }
-    , Standing
-        { position = 3
-        , team = "Arsenal"
-        , played = 21
-        , points = 43
-        , shield_S = "https://resources.premierleague.com/premierleague/badges/t3.svg"
+    [ Match
+        { matchId_match = "1"
+        , homeTeam_match = Team "ARS" "Arsenal" "https://resources.premierleague.com/premierleague/badges/t3.svg"
+        , awayTeam_match = Team "CHE" "Chelsea" "https://resources.premierleague.com/premierleague/badges/t8.svg"
+        , score_match = Score 2 1
+        , date_match = "2024-01-20"
+        , statistics_match = Statistics
+            (Score 58 42)
+            (Score 15 8)
+            (Score 7 3)
+            (Score 8 4)
+            (Score 10 12)
+            (Score 2 3)
+            (Score 0 0)
+            (Score 523 432)
+            (Score 87 82)
+        , mvp_match = MVP "BS7" "Bukayo Saka" "1 Goal, 1 Assist, 8 Key Passes"
+        , highlights_match = Highlights
+            "1"
+            (Player "BS7" "Bukayo Saka" "Forward" "https://resources.premierleague.com/premierleague/photos/players/250x250/p223340.png")
+            "Brilliant goal from outside the box"
+            "23"
         }
     ]
 
-findMatchById :: Int -> Maybe Match
-findMatchById searchId =
-    case filter (\m -> searchId == matchId m) exampleMatches of
-        [match] -> Just match
-        _       -> Nothing
+findMatch :: Text -> [Match] -> Maybe Match
+findMatch path_matchId matches = find (\eachMatch -> matchId_match eachMatch == path_matchId) matches    
 
 -- Definición de los endpoints
 app :: ScottyM ()
@@ -89,13 +56,23 @@ app = do
         json exampleMatches
     
     get "/matches/:matchId" $ do
-        matchIdStr <- pathParam "matchId" :: ActionM String
-        let searchId = read matchIdStr :: Int
-        case findMatchById searchId of
-            Just match -> json match
-            Nothing    -> do
-                status notFound404
-                json ("Match not found" :: String)
+        path_matchId <- pathParam "matchId"
+        case (findMatch) (path_matchId) (exampleMatches) of
+            Just eachMatch  -> json eachMatch
+            Nothing         -> status notFound404
+    
+    get "/matches/:matchId/statistics" $ do
+        path_matchId <- pathParam "matchId"
+        case (findMatch) (path_matchId) (exampleMatches) of
+            Just eachMatch  -> json (statistics_match eachMatch)
+            Nothing         -> status notFound404
+    
+    get "/matches/:matchId/highlights" $ do
+        path_matchId <- pathParam "matchId"
+        case (findMatch) (path_matchId) (exampleMatches) of
+            Just eachMatch  -> json (highlights_match eachMatch)
+            Nothing         -> status notFound404
 
-    get "/standings" $ do
-        json exampleStandings
+    get "/favicon.ico" $ do
+        setHeader "Content-Type" "image/x-icon"
+        raw ""
