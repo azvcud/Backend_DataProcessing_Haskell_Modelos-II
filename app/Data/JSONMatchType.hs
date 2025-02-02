@@ -1,13 +1,13 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Data.JSONType
+module Data.JSONMatchType
     ( Match(..)
     , Team(..)
     , Score(..)
     , Statistics(..)
     , MVP(..)
-    , Highlights(..)
+    , Highlight(..)
     , Player(..)
     ) where
 
@@ -24,7 +24,7 @@ data Match = Match
     , date_match        :: Text
     , statistics_match  :: Statistics
     , mvp_match         :: MVP
-    , highlights_match  :: Highlights 
+    , highlights_match  :: [Highlight] 
     } deriving (Show, Generic)
 
 data Team = Team
@@ -56,11 +56,11 @@ data MVP = MVP
     , stats_MVP     :: Text
     } deriving (Show, Generic)
 
-data Highlights = Highlights
-    { highlightId_highlights    :: Text
-    , player_highlights         :: Player
-    , moment_highlights         :: Text
-    , minute_hightlights        :: Text
+data Highlight = Highlight
+    { highlightId_highlight    :: Text
+    , player_highlight         :: Player
+    , moment_highlight         :: Text
+    , minute_highlight         :: Text
     } deriving (Show, Generic)
 
 data Player = Player
@@ -156,15 +156,15 @@ instance ToJSON MVP where
                , "stats" .= stats
                ]
 
-instance FromJSON Highlights where
-    parseJSON = withObject "Highlights" $ \v -> Highlights
+instance FromJSON Highlight where
+    parseJSON = withObject "Highlight" $ \v -> Highlight
         <$> v .: "highlightId"
         <*> v .: "player"
         <*> v .: "moment"
         <*> v .: "minute"
 
-instance ToJSON Highlights where
-    toJSON (Highlights hid player moment minute) =
+instance ToJSON Highlight where
+    toJSON (Highlight hid player moment minute) =
         object [ "highlightId" .= hid
                , "player" .= player
                , "moment" .= moment
