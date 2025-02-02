@@ -5,7 +5,7 @@ module Endpoints
     ) where
 
 import Network.HTTP.Types.Status (notFound404)
-import Web.Scotty
+import Web.Scotty ( get, json, pathParam, raw, setHeader, status, ScottyM )
 import Data.Text.Lazy (Text)
 import Data.List (find)
 

@@ -12,6 +12,14 @@ module Data.JSONMatchType
     ) where
 
 import Data.Aeson
+    ( (.:),
+      withObject,
+      object,
+      FromJSON(parseJSON),
+      KeyValue((.=)),
+      ToJSON(toJSON) 
+    )
+    
 import GHC.Generics (Generic)
 import Data.Text.Lazy (Text)
 
