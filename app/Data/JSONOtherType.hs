@@ -18,7 +18,7 @@ import Data.Aeson
       KeyValue((.=)),
       ToJSON(toJSON)
     )
-    
+
 import GHC.Generics (Generic)
 import Data.Text.Lazy (Text)
 

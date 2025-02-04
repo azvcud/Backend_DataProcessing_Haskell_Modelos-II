@@ -1,8 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Endpoints
-    ( app
-    ) where
+module Endpoints (app) where
 
 import Network.HTTP.Types.Status (notFound404)
 import Web.Scotty ( get, json, pathParam, raw, setHeader, status, ScottyM )
@@ -15,8 +13,7 @@ import Data.JSONMatchType
     , Score(..)
     , Statistics(..)
     , MVP(..)
-    , Highlight(..)
-    , Player(..)
+    , HeadToHead(..)
     )
 
 import Data.JSONOtherType
@@ -33,8 +30,8 @@ exampleMatches :: [Match]
 exampleMatches =
   [ Match
       "1"
-      (Team "ARS" "Arsenal" "https://resources.premierleague.com/premierleague/badges/t3.svg")
-      (Team "TOT" "Tottenham" "https://resources.premierleague.com/premierleague/badges/t6.svg")
+      (Team "ARS" "Arsenal" "https://resources.premierleague.com/premierleague/badges/t3.svg" 10 5)
+      (Team "TOT" "Tottenham" "https://resources.premierleague.com/premierleague/badges/t6.svg" 8 5)
       (Score 3 2)
       "2024-01-20"
       (Statistics
@@ -48,16 +45,15 @@ exampleMatches =
         (Score 578 432)
         (Score 89 83)
       )
-      (MVP "BS7" "Bukayo Saka" "2 Goals, 1 Assist, 7 Key Passes, 91% Pass Accuracy")
-      [ Highlight "1" (Player "BS7" "Bukayo Saka" "Right Winger" "https://resources.premierleague.com/premierleague/photos/players/250x250/p223340.png") "Spectacular curling shot into the top corner from outside the box" "23"
-      , Highlight "2" (Player "MO8" "Martin \216degaard" "Attacking Midfielder" "https://resources.premierleague.com/premierleague/photos/players/250x250/p184029.png") "Brilliant through ball assist to Saka" "45"
-      , Highlight "3" (Player "DR41" "Declan Rice" "Defensive Midfielder" "https://resources.premierleague.com/premierleague/photos/players/250x250/p217593.png") "Crucial tackle to prevent a counter-attack" "67"
-      , Highlight "4" (Player "BS7" "Bukayo Saka" "Right Winger" "https://resources.premierleague.com/premierleague/photos/players/250x250/p223340.png") "Clinical finish from close range after a team play" "78"
-      ]
+      (MVP "BS7" "Bukayo Saka" "2 Goals, 1 Assist, 7 Key Passes, 91% Pass Accuracy" "https://resources.premierleague.com/premierleague/photos/players/250x250/p223340.png")
+      (HeadToHead 
+        (Team "ARS" "Arsenal" "https://resources.premierleague.com/premierleague/badges/t3.svg" 10 5) 
+        (Team "TOT" "Tottenham" "https://resources.premierleague.com/premierleague/badges/t6.svg" 8 5)
+      )
   , Match
       "2"
-      (Team "LIV" "Liverpool" "https://resources.premierleague.com/premierleague/badges/t14.svg")
-      (Team "MCI" "Manchester City" "https://resources.premierleague.com/premierleague/badges/t43.svg")
+      (Team "LIV" "Liverpool" "https://resources.premierleague.com/premierleague/badges/t14.svg" 12 6)
+      (Team "MCI" "Manchester City" "https://resources.premierleague.com/premierleague/badges/t43.svg" 11 6)
       (Score 2 2)
       "2024-01-21"
       (Statistics
@@ -71,15 +67,15 @@ exampleMatches =
         (Score 523 612)
         (Score 86 91)
       )
-      (MVP "MS11" "Mohamed Salah" "1 Goal, 1 Assist, 6 Key Passes, 4 Successful Dribbles")
-      [ Highlight "1" (Player "MS11" "Mohamed Salah" "Right Winger" "https://resources.premierleague.com/premierleague/photos/players/250x250/p118748.png") "Incredible solo run and finish" "34"
-      , Highlight "2" (Player "EH9" "Erling Haaland" "Striker" "https://resources.premierleague.com/premierleague/photos/players/250x250/p223094.png") "Powerful header from De Bruyne's cross" "52"
-      , Highlight "3" (Player "KDB17" "Kevin De Bruyne" "Attacking Midfielder" "https://resources.premierleague.com/premierleague/photos/players/250x250/p61366.png") "Perfect assist with outside of the boot" "52"
-      ]
+      (MVP "MS11" "Mohamed Salah" "1 Goal, 1 Assist, 6 Key Passes, 4 Successful Dribbles" "https://resources.premierleague.com/premierleague/photos/players/250x250/p118748.png")
+      (HeadToHead
+        (Team "LIV" "Liverpool" "https://resources.premierleague.com/premierleague/badges/t14.svg" 12 6)
+        (Team "MCI" "Manchester City" "https://resources.premierleague.com/premierleague/badges/t43.svg" 11 6)
+      )
   , Match
       "3"
-      (Team "CHE" "Chelsea" "https://resources.premierleague.com/premierleague/badges/t8.svg")
-      (Team "MUN" "Manchester United" "https://resources.premierleague.com/premierleague/badges/t1.svg")
+      (Team "CHE" "Chelsea" "https://resources.premierleague.com/premierleague/badges/t8.svg" 9 7)
+      (Team "MUN" "Manchester United" "https://resources.premierleague.com/premierleague/badges/t1.svg" 10 7)
       (Score 4 3)
       "2024-01-22"
       (Statistics
@@ -93,11 +89,11 @@ exampleMatches =
         (Score 567 489)
         (Score 88 84)
       )
-      (MVP "CP20" "Cole Palmer" "2 Goals, 1 Assist, 5 Key Passes, 3 Successful Dribbles")
-      [ Highlight "1" (Player "CP20" "Cole Palmer" "Attacking Midfielder" "https://resources.premierleague.com/premierleague/photos/players/250x250/p244851.png") "Stunning free-kick into the top corner" "15"
-      , Highlight "2" (Player "MR10" "Marcus Rashford" "Forward" "https://resources.premierleague.com/premierleague/photos/players/250x250/p176297.png") "Counter-attack goal after brilliant run" "33"
-      , Highlight "3" (Player "CP20" "Cole Palmer" "Attacking Midfielder" "https://resources.premierleague.com/premierleague/photos/players/250x250/p244851.png") "Penalty kick goal after VAR review" "89"
-      ]
+      (MVP "CP20" "Cole Palmer" "2 Goals, 1 Assist, 5 Key Passes, 3 Successful Dribbles" "https://resources.premierleague.com/premierleague/photos/players/250x250/p244851.png")
+      (HeadToHead 
+        (Team "CHE" "Chelsea" "https://resources.premierleague.com/premierleague/badges/t8.svg" 9 7) 
+        (Team "MUN" "Manchester United" "https://resources.premierleague.com/premierleague/badges/t1.svg" 10 7)
+      )
   ]
 
 exampleStanding :: [Standing]
@@ -162,19 +158,7 @@ app = do
         case (findMatch) (path_matchId) (exampleMatches) of
             Just eachMatch  -> json eachMatch
             Nothing         -> status notFound404
-    
-    get "/match/:matchId/statisticsNigger" $ do
-        path_matchId <- pathParam "matchId"
-        case (findMatch) (path_matchId) (exampleMatches) of
-            Just eachMatch  -> json (statistics_match eachMatch)
-            Nothing         -> status notFound404
-    
-    get "/match/:matchId/highlightsNigger" $ do
-        path_matchId <- pathParam "matchId"
-        case (findMatch) (path_matchId) (exampleMatches) of
-            Just eachMatch  -> json (highlights_match eachMatch)
-            Nothing         -> status notFound404
-    
+
     get "/standings" $ do
         json exampleStanding
 

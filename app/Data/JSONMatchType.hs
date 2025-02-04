@@ -7,8 +7,7 @@ module Data.JSONMatchType
     , Score(..)
     , Statistics(..)
     , MVP(..)
-    , Highlight(..)
-    , Player(..)
+    , HeadToHead(..)
     ) where
 
 import Data.Aeson
@@ -32,13 +31,15 @@ data Match = Match
     , date_match        :: Text
     , statistics_match  :: Statistics
     , mvp_match         :: MVP
-    , highlights_match  :: [Highlight] 
+    , headToHead_match  :: HeadToHead
     } deriving (Show, Generic)
 
 data Team = Team
     { teamId_team   :: Text
     , name_team     :: Text
     , shield_team   :: Text
+    , wins_team     :: Int
+    , draws_team    :: Int
     } deriving (Show, Generic)
 
 data Score = Score
@@ -62,20 +63,12 @@ data MVP = MVP
     { playerId_MVP  :: Text
     , name_MVP      :: Text
     , stats_MVP     :: Text
+    , imageUrl_MVP  :: Text
     } deriving (Show, Generic)
 
-data Highlight = Highlight
-    { highlightId_highlight    :: Text
-    , player_highlight         :: Player
-    , moment_highlight         :: Text
-    , minute_highlight         :: Text
-    } deriving (Show, Generic)
-
-data Player = Player
-    { playerId_player   :: Text
-    , name_player       :: Text
-    , position_player   :: Text
-    , imageUrl_player   :: Text
+data HeadToHead = HeadToHead
+    { homeTeam_headtohead   :: Team
+    , awayTeam_headtohead   :: Team
     } deriving (Show, Generic)
 
 -- Instancias de FromJSON y ToJSON para los tipos de datos
@@ -88,10 +81,10 @@ instance FromJSON Match where
         <*> v .: "date"
         <*> v .: "statistics"
         <*> v .: "mvp"
-        <*> v .: "highlights"
+        <*> v .: "headToHead"
 
 instance ToJSON Match where
-    toJSON (Match mid home away score date stats mvp highlights) =
+    toJSON (Match mid home away score date stats mvp headhead) =
         object [ "matchId" .= mid
                , "homeTeam" .= home
                , "awayTeam" .= away
@@ -99,7 +92,7 @@ instance ToJSON Match where
                , "date" .= date
                , "statistics" .= stats
                , "mvp" .= mvp
-               , "highlights" .= highlights
+               , "headToHead" .= headhead
                ]
 
 instance FromJSON Team where
@@ -107,12 +100,16 @@ instance FromJSON Team where
         <$> v .: "teamId"
         <*> v .: "name"
         <*> v .: "shield"
+        <*> v .: "wins"
+        <*> v .: "draws"
 
 instance ToJSON Team where
-    toJSON (Team tid name shield) =
+    toJSON (Team tid name shield win draw) =
         object [ "teamId" .= tid
                , "name" .= name
                , "shield" .= shield
+               , "wins" .= win
+               , "draws" .= draw
                ]
 
 instance FromJSON Score where
@@ -133,7 +130,7 @@ instance FromJSON Statistics where
         <*> v .: "shotsOnTarget"
         <*> v .: "corners"
         <*> v .: "fouls"
-        <*> v .: "yellowCard"
+        <*> v .: "yellowCards"
         <*> v .: "redCards"
         <*> v .: "passes"
         <*> v .: "passAcurracy"
@@ -145,7 +142,7 @@ instance ToJSON Statistics where
                , "shotsOnTarget" .= shotsOnTarget
                , "corners" .= corners
                , "fouls" .= fouls
-               , "yellowCard" .= yellow
+               , "yellowCards" .= yellow
                , "redCards" .= red
                , "passes" .= passes
                , "passAcurracy" .= passAccuracy
@@ -156,40 +153,23 @@ instance FromJSON MVP where
         <$> v .: "playerId"
         <*> v .: "name"
         <*> v .: "stats"
+        <*> v .: "imageUrl"
 
 instance ToJSON MVP where
-    toJSON (MVP pid name stats) =
+    toJSON (MVP pid name stats url) =
         object [ "playerId" .= pid
                , "name" .= name
                , "stats" .= stats
+               , "imageUrl" .= url
                ]
 
-instance FromJSON Highlight where
-    parseJSON = withObject "Highlight" $ \v -> Highlight
-        <$> v .: "highlightId"
-        <*> v .: "player"
-        <*> v .: "moment"
-        <*> v .: "minute"
+instance ToJSON HeadToHead where
+    toJSON (HeadToHead homeTeam awayTeam) = object
+        [ "homeTeam" .= homeTeam
+        , "awayTeam" .= awayTeam
+        ]
 
-instance ToJSON Highlight where
-    toJSON (Highlight hid player moment minute) =
-        object [ "highlightId" .= hid
-               , "player" .= player
-               , "moment" .= moment
-               , "minute" .= minute
-               ]
-
-instance FromJSON Player where
-    parseJSON = withObject "Player" $ \v -> Player
-        <$> v .: "playerId"
-        <*> v .: "name"
-        <*> v .: "position"
-        <*> v .: "imageUrl"
-
-instance ToJSON Player where
-    toJSON (Player pid name pos img) =
-        object [ "playerId" .= pid
-               , "name" .= name
-               , "position" .= pos
-               , "imageUrl" .= img
-               ]
+instance FromJSON HeadToHead where
+    parseJSON = withObject "HeadToHead" $ \v -> HeadToHead
+        <$> v .: "homeTeam"
+        <*> v .: "awayTeam"
