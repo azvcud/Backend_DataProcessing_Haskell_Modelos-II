@@ -3,9 +3,11 @@
 module Endpoints (app) where
 
 import Network.HTTP.Types.Status (notFound404)
-import Web.Scotty ( get, json, pathParam, raw, setHeader, status, ScottyM )
+import Web.Scotty ( get, json, pathParam, raw, setHeader, status, ScottyM, middleware )
 import Data.Text.Lazy (Text)
 import Data.List (find)
+import FootballAPI (getFixtures)
+import Control.Monad.IO.Class (liftIO)
 
 import Data.JSONMatchType 
     ( Match(..)
@@ -171,3 +173,9 @@ app = do
     get "/favicon.ico" $ do
         setHeader "Content-Type" "image/x-icon"
         raw ""
+    
+    get "/external-fixtures" $ do
+        fixtures <- liftIO getFixtures
+        case fixtures of
+            Just fs -> json fs
+            Nothing -> status notFound404
