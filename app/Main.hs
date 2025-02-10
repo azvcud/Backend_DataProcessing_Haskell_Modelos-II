@@ -2,6 +2,9 @@ module Main where
 
 import Web.Scotty ( scotty )
 import Endpoints ( app )
+import APIProcessing ( printFixtures )
 
 main :: IO ()
-main = scotty 8000 app
+main = do
+    printFixtures
+    scotty 8000 app

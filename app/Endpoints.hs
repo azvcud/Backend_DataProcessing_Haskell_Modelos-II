@@ -3,9 +3,22 @@
 module Endpoints (app) where
 
 import Network.HTTP.Types.Status (notFound404)
-import Web.Scotty ( get, json, pathParam, raw, setHeader, status, ScottyM)
+import Web.Scotty ( get, json, param, queryParam, pathParam, raw, setHeader, status, ScottyM )
 import Data.Text.Lazy (Text)
 import Data.List (find)
+import Control.Monad.IO.Class (liftIO)
+import Data.Maybe (fromMaybe)
+import Text.Read (readMaybe)
+
+import FootballAPI
+    ( getFixtures,
+      getMatches,
+      getClubs,
+      getMatchStatistics,
+      getStandings,
+      getMVP_ID,
+      getScrape,
+      getMVP ) 
 
 import Data.JSONMatchType 
     ( Match(..)
@@ -167,7 +180,72 @@ app = do
     
     get "/analysis" $ do
         json exampleMatchAnalysis
-
+    
     get "/favicon.ico" $ do
         setHeader "Content-Type" "image/x-icon"
         raw ""
+    
+    {-
+    get "/fixtures" $ do
+        fixtures <- liftIO getFixtures
+        case fixtures of
+            Just fs -> json fs
+            Nothing -> status notFound404
+    
+    -- Endpoint para obtener los resultados de los partidos
+    get "/match-results" $ do
+        matches <- liftIO getMatches
+        case matches of
+            Just ms -> json ms
+            Nothing -> status notFound404
+    
+    -- Endpoint para obtener los clubes
+    get "/badges" $ do
+        clubs <- liftIO getClubs
+        case clubs of
+            Just cs -> json cs
+            Nothing -> status notFound404
+    
+    -- Endpoint para obtener estadísticas de un partido específico
+    get "/match-stats/:matchId" $ do
+        matchId <- pathParam "matchId" 
+        stats <- liftIO $ getMatchStatistics matchId
+        
+        case stats of
+            Just st -> json st 
+            Nothing -> status notFound404 
+    
+    -- Endpoint para obtener la clasificación de la liga
+    get "/standings" $ do
+        standings <- liftIO getStandings
+        case standings of
+            Just st -> json st
+            Nothing -> status notFound404
+    
+    -- Endpoint para obtener el MVP por pollId
+    get "/poll-mvp/:pollId" $ do
+        path_pollId <- pathParam "pollId"
+        mvp <- liftIO $ getMVP_ID path_pollId
+        case mvp of
+            Just mv -> json mv
+            Nothing -> status notFound404
+
+    -- Endpoint para obtener los enfrentamientos históricos
+    get "/scrape" $ do
+        matchIdsParam <- queryParam "matchIds"  
+        
+        headsToHeads <- liftIO $ getScrape matchIdsParam
+        
+        case headsToHeads of
+            Just ht -> json ht  
+            Nothing -> status notFound404 
+    
+    -- Endpoint para obtener estadísticas MVP de un jugador en un partido específico
+    get "/mvp-stats/:playerId/:matchId" $ do
+        path_playerId <- pathParam "playerId"
+        path_matchId <- pathParam "matchId"
+        mvpStats <- liftIO $ getMVP path_playerId path_matchId
+        case mvpStats of
+            Just ms -> json ms
+            Nothing -> status notFound404
+    -}

@@ -2,8 +2,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module FetchData.PremierLeagueTableAPI
-    ( PremierLeagueTable(..)
-    , PremierLeagueTeam(..)
+    ( PremierLeagueTeam(..)
     , TeamName(..)
     , Overall(..)
     , Form(..)
@@ -20,10 +19,6 @@ import Data.Aeson
 
 import GHC.Generics (Generic)
 import Data.Text.Lazy (Text)
-
-data PremierLeagueTable = PremierLeagueTable
-    { premierLeagueTeam_pl :: [PremierLeagueTeam] }
-    deriving (Show, Generic)
 
 data PremierLeagueTeam = PremierLeagueTeam
     { team_premier      :: TeamName
@@ -45,3 +40,60 @@ data Overall = Overall
 data Form = Form
     { outcome_form :: Text }
     deriving (Show, Generic)
+
+
+-- Instancia FromJSON para PremierLeagueTeam
+
+instance FromJSON PremierLeagueTeam where
+    parseJSON = withObject "PremierLeagueTeam" $ \v -> PremierLeagueTeam
+        <$> v .: "team"
+        <*> v .: "position"
+        <*> v .: "overall"
+        <*> v .: "form"
+
+-- Instancia ToJSON para PremierLeagueTeam
+
+instance ToJSON PremierLeagueTeam where
+    toJSON (PremierLeagueTeam team position overall form) =
+        object [ "team" .= team
+               , "position" .= position
+               , "overall" .= overall
+               , "form" .= form ]
+
+-- Instancia FromJSON para TeamName
+
+instance FromJSON TeamName where
+    parseJSON = withObject "TeamName" $ \v -> TeamName
+        <$> v .: "name"
+
+-- Instancia ToJSON para TeamName
+
+instance ToJSON TeamName where
+    toJSON (TeamName name) = object [ "name" .= name ]
+
+-- Instancia FromJSON para Overall
+
+instance FromJSON Overall where
+    parseJSON = withObject "Overall" $ \v -> Overall
+        <$> v .: "played"
+        <*> v .: "points"
+        <*> v .: "goalsDifference"
+
+-- Instancia ToJSON para Overall
+
+instance ToJSON Overall where
+    toJSON (Overall played points goalsDifference) =
+        object [ "played" .= played
+               , "points" .= points
+               , "goalsDifference" .= goalsDifference ]
+
+-- Instancia FromJSON para Form
+
+instance FromJSON Form where
+    parseJSON = withObject "Form" $ \v -> Form
+        <$> v .: "outcome"
+
+-- Instancia ToJSON para Form
+
+instance ToJSON Form where
+    toJSON (Form outcome) = object [ "outcome" .= outcome ]
