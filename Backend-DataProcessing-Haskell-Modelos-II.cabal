@@ -79,7 +79,8 @@ executable Backend-DataProcessing-Haskell-Modelos-II
                     FetchData.PremierLeagueTableAPI,
                     FetchData.MVP_PlayerAPI,
                     FootballAPI,
-                    APIProcessing,
+                    APIProcessing.UpcomingMatchProcess,
+                    APIProcessing.StandingProcess,
                     Endpoints
 
     -- Enable extensions used in your code (e.g., OverloadedStrings)
@@ -97,7 +98,8 @@ executable Backend-DataProcessing-Haskell-Modelos-II
                     lens >=5.2.3 && <5.4,
                     http-types >= 0.12.4,
                     bytestring >=0.11.5.0 && <0.12,
-                    unordered-containers >= 0.2.20
+                    unordered-containers >= 0.2.20,
+                    time
 
     -- Directories containing source files.
     hs-source-dirs:   app

@@ -20,6 +20,9 @@ import FootballAPI
       getScrape,
       getMVP ) 
 
+import APIProcessing.UpcomingMatchProcess ( createUpcomingMatches )
+import APIProcessing.StandingProcess ( getStandingsWithClubs )
+
 import Data.JSONMatchType 
     ( Match(..)
     , Team(..)
@@ -158,7 +161,7 @@ exampleMatchAnalysis =
     ]
 
 findMatch :: Text -> [Match] -> Maybe Match
-findMatch path_matchId matches = find (\eachMatch -> matchId_match eachMatch == path_matchId) matches    
+findMatch path_matchId matches = find (\eachMatch -> matchId_match eachMatch == path_matchId) matches
 
 -- Definición de los endpoints
 app :: ScottyM ()
@@ -173,10 +176,12 @@ app = do
             Nothing         -> status notFound404
 
     get "/standings" $ do
-        json exampleStanding
+        standings <- liftIO getStandingsWithClubs
+        json standings
 
     get "/upcoming" $ do
-        json exampleUpcomingMatches
+        upcomingMatches <- liftIO createUpcomingMatches
+        json upcomingMatches
     
     get "/analysis" $ do
         json exampleMatchAnalysis
